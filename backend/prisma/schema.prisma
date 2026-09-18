@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Portfolio CMS — sellable system tables.
+// Scale order (see db/init.sql): vertical -> stateless replicas -> pooler ->
+// replicas -> Redis cache-aside -> BullMQ queue -> sharding LAST.
+// Projects + Posts are read-heavy -> Redis cache-aside 90s/300s, stale-while-revalidate.
+// Messages (contact) are write-heavy -> persist + enqueue worker, never block the request.
+
+model Project {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  tagline     String
+  description String
+  tech        String[]
+  liveUrl     String?
+  repoUrl     String?
+  imageUrl    String?
+  featured    Boolean  @default(false)
+  sort        Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([featured, sort])
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  excerpt   String
+  body      String
+  coverUrl  String?
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, createdAt])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String   @default("Portfolio contact")
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([read, createdAt])
+}
