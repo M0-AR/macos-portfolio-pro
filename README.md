@@ -22,10 +22,10 @@ git push -u origin main
 
 ![Animated demo — desktop, Finder, Terminal in action](docs/demo.gif)
 
-Video walkthrough (`docs/demo.mp4`, 0.4 MB, plays on GitHub via the file link below):
+Video walkthrough (`docs/demo.mp4`, 0.1 MB, plays on GitHub via the file link below):
 
 - [▶ Watch docs/demo.mp4](docs/demo.mp4)
-- GIF above is the autoplay preview (1.4 MB, under the 5 MB GitHub fast-load budget). MP4 is under the 10 MB GitHub upload budget.
+- GIF above is the autoplay preview (0.4 MB, under the 5 MB GitHub fast-load budget). MP4 is under the 10 MB GitHub upload budget.
 
 > GitHub README rendering, verified 2026 across 4 sources (websearch ×2, SearXNG, DuckDuckGo fallback; `agent-reach` CLI not installed on this host so its `web` channel was skipped): GIFs autoplay inline everywhere including mobile and npm; local `.mp4` files render as a download link, not an inline player. True inline MP4 players only work from `user-images.githubusercontent.com` URLs created by dragging the video into a GitHub issue/PR comment, or via a clickable YouTube thumbnail. That's why this README ships **both**: GIF for instant gratification + MP4 file link for quality + optional YouTube thumbnail pattern below.
 
@@ -40,7 +40,10 @@ Re-record the demo yourself — verified commands on this host (`ffmpeg 8.0.1` p
 ```bash
 # 1. Record: macOS Cmd+Shift+5, Windows Xbox Game Bar, or Linux recorder — 15–30s max
 # 2. Trim to the best 5–15s, then:
-ffmpeg -y -i docs/demo.mp4 -vf "fps=12,scale=640:-1" docs/demo.gif  # 12 FPS + 640px = sweet spot, verified 581 KB output
+ffmpeg -y -i docs/demo.mp4 -vf "fps=12,scale=640:-1" docs/demo.gif  # 12 FPS + 640px = sweet spot
+# Slideshow-style demo (what docs/demo.* actually is — 4 Playwright frames, 2s each, verified):
+# ffmpeg -y -framerate 1/2 -i seq-%02d.png -vf "scale=1280:-1,format=yuv420p" -movflags +faststart -r 30 docs/demo.mp4
+# ffmpeg -y -i docs/demo.mp4 -vf "fps=2,scale=640:-1:flags=lanczos,split[s0][s1];[s0]palettegen=max_colors=128[p];[s1][p]paletteuse" docs/demo.gif
 # 3. Keep GIF <5 MB, MP4 <10 MB, then commit both — Playwright screenshots live in docs/assets/
 ```
 
